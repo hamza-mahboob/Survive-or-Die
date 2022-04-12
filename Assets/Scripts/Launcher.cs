@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -6,11 +7,17 @@ using TMPro;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
-    public GameObject mainMenu, loadingMenu, createRoomMenu, roomMenu, errorMenu;
+    public static Launcher instance;
+    public GameObject mainMenu, loadingMenu, createRoomMenu, roomMenu, errorMenu, findRoomMenu;
     public TMP_InputField roomNameInput;
     public TMP_Text errorText, roomNameText;
-    private Transform roomListContent;
-    private GameObject roomListItemPrefab;
+    public Transform roomListContent;
+    public GameObject roomListItemPrefab;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -58,12 +65,21 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         loadingMenu.SetActive(false);
         mainMenu.SetActive(true);
-        
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        base.OnRoomListUpdate(roomList);
+        //clear the list
+        foreach (Transform trans in roomListContent)
+        {
+            Destroy(trans.gameObject);
+        }
+
+        //initiate rooms
+        for (int i = 0; i < roomList.Count; i++)
+        {
+            Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp((roomList[i]));
+        }
     }
 
 
@@ -77,21 +93,41 @@ public class Launcher : MonoBehaviourPunCallbacks
         createRoomMenu.SetActive(false);
         loadingMenu.SetActive(true);
     }
+
     public void OpenMainMenu()
     {
         errorMenu.SetActive(false);
         mainMenu.SetActive(true);
     }
+
     public void OpenCreateMenu()
     {
         mainMenu.SetActive(false);
         createRoomMenu.SetActive(true);
     }
-    
+
+    public void OpenFindMenu()
+    {
+        mainMenu.SetActive(false);
+        findRoomMenu.SetActive(true);
+    }
+
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
         roomMenu.SetActive(false);
         loadingMenu.SetActive(true);
+    }
+
+    public void JoinRoom(RoomInfo info)
+    {
+        PhotonNetwork.JoinRoom((info.Name));
+        loadingMenu.SetActive(true);
+    }
+
+    public void CloseJoinRoom()
+    {
+        findRoomMenu.SetActive(false);
+        mainMenu.SetActive(true);
     }
 }
