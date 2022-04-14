@@ -23,6 +23,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1;
         Debug.Log("Connecting to Master");
         loadingMenu.SetActive(true);
 
@@ -86,7 +87,7 @@ public class Launcher : MonoBehaviourPunCallbacks
             Destroy(trans.gameObject);
         }
 
-        //initiate rooms
+        //initiate rooms in list
         for (int i = 0; i < roomList.Count; i++)
         {
             //dont instantiate buttons for rooms that are removed from the list
@@ -150,5 +151,13 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         // '1' is the index of game scene in build settings
         PhotonNetwork.LoadLevel(1);
+    }
+
+    public void QuitButton()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        Application.Quit();
     }
 }
