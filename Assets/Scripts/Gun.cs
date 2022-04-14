@@ -11,6 +11,11 @@ public class Gun : MonoBehaviour
     private int gunDamage = 2;
     //public GameObject gunPrefab;
 
+    private void Start()
+    {
+        lr.enabled = false;
+    }
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
