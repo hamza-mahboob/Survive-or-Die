@@ -33,7 +33,8 @@ public class PlayerManager : MonoBehaviour
     {
         Debug.Log("Instantiate player controller");
         //instantiate player controller
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerController"), Vector3.zero, Quaternion.identity);
+        Transform spawnPoint = SpawnManager.instance.GetRandomSpawnPoint();
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerController"), spawnPoint.position, spawnPoint.rotation);
     }
 
     void CreateKillerController()
@@ -41,6 +42,7 @@ public class PlayerManager : MonoBehaviour
         //create enemy at host
         Debug.Log("Instantiate killer controller");
         //instantiate killer controller
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "KillerController"), Vector3.zero, Quaternion.identity);
+        Transform spawnPoint = SpawnManager.instance.GetRandomSpawnPoint();
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "KillerController"), spawnPoint.position, spawnPoint.rotation);
     }
 }
