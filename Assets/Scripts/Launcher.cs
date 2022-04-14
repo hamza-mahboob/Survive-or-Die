@@ -13,6 +13,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public TMP_Text errorText, roomNameText;
     public Transform roomListContent;
     public GameObject roomListItemPrefab;
+    public GameObject startGameButton;
 
     private void Awake()
     {
@@ -35,6 +36,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("Connected to Master");
         //join lobby
         PhotonNetwork.JoinLobby();
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     public override void OnJoinedLobby()
@@ -51,6 +53,15 @@ public class Launcher : MonoBehaviourPunCallbacks
         loadingMenu.SetActive(false);
         roomMenu.SetActive(true);
         roomNameText.text = "Room Name: " + PhotonNetwork.CurrentRoom.Name;
+        
+        //start button only available for host
+        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
+    }
+
+    //if host is changed
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -78,6 +89,10 @@ public class Launcher : MonoBehaviourPunCallbacks
         //initiate rooms
         for (int i = 0; i < roomList.Count; i++)
         {
+            //dont instantiate buttons for rooms that are removed from the list
+            if(roomList[i].RemovedFromList)
+                continue;
+            
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp((roomList[i]));
         }
     }
@@ -129,5 +144,11 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         findRoomMenu.SetActive(false);
         mainMenu.SetActive(true);
+    }
+
+    public void StartGame()
+    {
+        // '1' is the index of game scene in build settings
+        PhotonNetwork.LoadLevel(1);
     }
 }
